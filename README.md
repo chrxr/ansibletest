@@ -1,10 +1,8 @@
-Instructions for building TEI Catalogue application using Ansible and Vagrant
-=============================================================================
+Instructions for building SolrCloud / Blacklight application using Ansible and Vagrant
+======================================================================================
 
 Overview
 --------
-
-Note: Following this Readme to the letter will result in a local version of the boilerplate Blacklight application with Tolkien data within it. For building the application for a different TEI catalogue, see the 'catalogue_creation_workflow.md' file.
 
 These scripts install the following applications:
 
