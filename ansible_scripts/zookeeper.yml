@@ -1,0 +1,10 @@
+---
+- name: Install and start Zookeeper
+  hosts: "{{ host }}"
+
+  become: yes
+  become_method: sudo
+
+  roles:
+     - common
+     - zookeeper

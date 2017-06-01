@@ -1,0 +1,10 @@
+---
+- name: Install and start SolrCloud nodes
+  hosts: "{{ host }}"
+
+  become: yes
+  become_method: sudo
+
+  roles:
+     - common
+     - solrcloud

@@ -1,0 +1,40 @@
+---
+
+redhat_packages:
+  - python-setuptools-devel
+  - wget
+  - unzip
+  - openssl-devel
+  - libffi-devel
+  - libxml2-devel
+  - libyaml-devel
+  - postgresql-libs
+  - zlib-devel
+  - sqlite-devel
+  - gcc
+  - make
+  - automake
+  - autoconf
+  - curl-devel
+  - nodejs
+
+ubuntu_packages:
+  - build-essential
+  - curl
+  - git
+  - libaprutil1-dev
+  - libcurl4-openssl-dev
+  - libffi-dev
+  - libpq-dev
+  - libreadline-dev
+  - libsqlite3-dev
+  - libssl-dev
+  - libxml2-dev
+  - libxslt1-dev
+  - libyaml-dev
+  - nodejs
+  - npm
+  - sqlite3
+  - unzip
+  - wget
+  - zlib1g-dev

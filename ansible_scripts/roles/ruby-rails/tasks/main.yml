@@ -1,0 +1,69 @@
+---
+
+##### This playbook install ruby and rails utilising rbenv to manage ruby versions
+
+  - name: Install Node 6 repo on production to allow static asset compilation
+    shell: curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
+    when: env == 'prd'
+
+  - name: Yum install node 6
+    yum:
+      name: nodejs
+      state: latest
+    when: env == 'prd'
+
+  - name: Clone .rbenv repo
+    git:
+      repo: https://github.com/rbenv/rbenv.git
+      dest: "{{ svc_home}}/.rbenv"
+      update: no
+    become: yes
+    become_user: "{{ svc_user }}"
+
+
+  - name: Add .bashrc file with ruby path changes
+    copy:
+      src: templates/.bashrc
+      dest: "{{ svc_home }}/.bashrc"
+      owner: bodl-tei-svc
+
+
+  - name: Compile dynamic bash extension
+    shell: src/configure && make -C src
+    args:
+      chdir: "{{ svc_home }}/.rbenv"
+    become: yes
+    become_user: "{{ svc_user }}"
+    ignore_errors: yes
+
+
+  - name: Clone ruby-build repo
+    git:
+      repo: https://github.com/rbenv/ruby-build.git
+      dest: "{{ svc_home }}/.rbenv/plugins/ruby-build"
+      update: no
+
+
+  - name: Install ruby
+    shell: source {{ svc_home }}/.bashrc && rbenv install 2.3.1 -v
+    args:
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ svc_user }}"
+    ignore_errors: yes
+
+
+  - name: Change global version of ruby
+    shell: source {{ svc_home }}/.bashrc && rbenv global 2.3.1
+    args:
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ svc_user }}"
+
+
+  - name: Install rails
+    shell: source {{ svc_home }}/.bashrc && gem install rails -v 5.0.1 --no-document
+    args:
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ svc_user }}"

@@ -1,0 +1,8 @@
+---
+  env: qa
+  rails_env: development
+  apache_port: 80
+  hostname: black01-qa.bodleian.ox.ac.uk
+  zookeeper_host: "{{ hostvars['zoo1-qa']['ansible_host'] }}"
+  solr_url: "{{ hostvars['solr1-qa']['ansible_host'] }}"
+  blacklight_git_branch: develop

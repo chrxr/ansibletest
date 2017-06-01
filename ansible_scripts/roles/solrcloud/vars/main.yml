@@ -1,0 +1,7 @@
+---
+
+redhat_packages:
+  - git
+
+ubuntu_packages:
+  - git

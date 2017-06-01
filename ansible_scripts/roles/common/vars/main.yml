@@ -1,0 +1,13 @@
+---
+
+  # svc_home and svc_user are the variables for the service user name and dir
+  svc_home: /home/bodl-tei-svc
+  svc_user: bodl-tei-svc
+  # these variables are all used in httpd.conf file
+  log_dir: var/log
+  # rails_app_dir is used in httpd.conf and apache_passenger.conf
+  rails_app_dir: parts/blacklight
+  # These vars are used to pull down the solr config from GitLab and push to Solr node
+  # 'name' is the config folder name in which the conf dir will be cloned
+  solr_conf_repos:
+    - { name: "tolkien_config", url: "git@gitlab.bodleian.ox.ac.uk:TEI-consolidation/tolkien-solrconfig.git" }

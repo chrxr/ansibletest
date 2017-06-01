@@ -1,0 +1,12 @@
+- name: Install Blacklight
+  hosts: "{{ host }}"
+
+  become: yes
+  become_method: sudo
+
+  roles:
+    - common
+    - blacklight-setup
+    - apache
+    - ruby-rails
+    - { role: blacklight-install, catalogue: "{{ catalogue }}" }

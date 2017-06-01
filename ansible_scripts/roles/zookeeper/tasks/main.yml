@@ -1,0 +1,53 @@
+---
+  ##### This isn't necessary on qa or production machines as Java 8 will be installed
+
+  - name: add openjdk8 aptrepo
+    apt_repository:
+      repo: 'ppa:openjdk-r/ppa'
+      state: present
+    when:
+      - env == "dev"
+    ignore_errors: yes
+
+  - name: add openjdk8
+    apt:
+      name: openjdk-8-jdk
+      update_cache: yes
+    when:
+      - env == "dev"
+    ignore_errors: yes
+
+  - name: get_url version of zookeeper download
+    get_url:
+      url: http://mirrors.ukfast.co.uk/sites/ftp.apache.org/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz
+      dest: "{{ svc_home }}/zookeeper-3.4.8.tar.gz"
+      timeout: 60
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: untar zookeeper
+    unarchive:
+      src: "{{ svc_home }}/zookeeper-3.4.8.tar.gz"
+      dest: "{{ svc_home }}"
+      remote_src: yes
+    args:
+      creates: "{{ svc_home }}/zookeeper-3.4.8"
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: copy zookeeper config
+    copy:
+      src: templates/zoo.cfg
+      dest: "{{ svc_home }}/zookeeper-3.4.8/conf/zoo.cfg"
+      # owner: "{{ svc_user }}"
+
+  - name: stop zookeeper
+    shell: bin/zkServer.sh stop
+    args:
+      chdir: "{{ svc_home }}/zookeeper-3.4.8"
+    ignore_errors: yes
+
+  - name: start zookeeper
+    shell: bin/zkServer.sh start
+    args:
+      chdir: "{{ svc_home }}/zookeeper-3.4.8"

@@ -1,0 +1,51 @@
+---
+
+  - name: Clone Blacklight repo
+    git:
+      repo: "{{ catalogues[catalogue].repo }}"
+      dest: "{{ svc_home}}/sites/bodl-tei-svc/parts/blacklight"
+      update: yes
+      accept_hostkey: yes
+      version: "{{ blacklight_git_branch }}"
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: Install Blacklight gems
+    shell: source {{ svc_home }}/.bashrc && bundle install
+    args:
+      chdir: "{{ svc_home}}/sites/bodl-tei-svc/parts/blacklight"
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: Template blacklight.yml file
+    template:
+      src: templates/blacklight.yml
+      dest: "{{ svc_home }}/sites/bodl-tei-svc/parts/blacklight/config/blacklight.yml"
+      owner: "{{ svc_user }}"
+      group: "{{ svc_user }}"
+
+  - name: run DB migrate
+    shell: source {{ svc_home }}/.bashrc && bundle exec rake db:migrate RAILS_ENV={{ rails_env }}
+    args:
+      chdir: "{{ svc_home }}/sites/bodl-tei-svc/parts/blacklight"
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: Install passenger apache module
+    shell: "source {{ svc_home }}/.bashrc && {{svc_home}}/.rbenv/versions/2.3.1/bin/passenger-install-apache2-module --auto --apxs2-path={{ svc_home }}/sites/{{ svc_user }}/parts/apache/bin/apxs"
+    args:
+      chdir: "{{ svc_home }}/sites/bodl-tei-svc/parts/blacklight"
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: Compile static assets on production
+    shell: "source {{ svc_home }}/.bashrc && bundle exec rake assets:precompile RAILS_ENV={{ rails_env }}"
+    args:
+      chdir: "{{ svc_home }}/sites/bodl-tei-svc/parts/blacklight"
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ svc_user }}"
+    when: env == "prd"

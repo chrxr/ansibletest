@@ -1,0 +1,8 @@
+---
+  catalogues:
+    tolkien:
+      repo: git@gitlab.bodleian.ox.ac.uk:TEI-consolidation/tei-blacklight.git
+      solr_collection: tolkien-catalogue
+    fihrist:
+      repo: git@gitlab.bodleian.ox.ac.uk:TEI-consolidation/fihrist-blacklight.git
+      solr_collection: fihrist-catalogue

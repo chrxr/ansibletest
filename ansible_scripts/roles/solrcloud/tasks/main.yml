@@ -1,0 +1,106 @@
+---
+
+  ##### This isn't necessary on qa or production machines as Java 8 will be installed
+
+  - name: apt-get update
+    apt:
+      update_cache: yes
+    when:
+      - ansible_distribution == "Ubuntu"
+
+  - name: install RedHat packages
+    yum: name={{ item }} state=latest
+    with_items: "{{ redhat_packages }}"
+    when:
+      - ansible_distribution == "RedHat"
+
+  - name: install Ubuntu packages
+    apt: name={{ item }} state=latest
+    with_items: "{{ ubuntu_packages }}"
+    when:
+      - ansible_distribution == "Ubuntu"
+
+  - name: add openjdk8 aptrepo
+    apt_repository:
+      repo: 'ppa:openjdk-r/ppa'
+      state: present
+    when:
+      - env == "dev"
+    ignore_errors: yes
+
+  - name: add openjdk8
+    apt:
+      name: openjdk-8-jdk
+      update_cache: yes
+    when:
+      - env == "dev"
+    ignore_errors: yes
+
+  - name: check Solr not already installed
+    stat: path="{{ svc_user }}/solr-6.4.0/"
+    register: solr_dir
+
+  - name: get_url version of solr download
+    get_url:
+      url: http://archive.apache.org/dist/lucene/solr/6.4.0/solr-6.4.0.tgz
+      dest: "{{ svc_home }}/solr-6.4.0.tgz"
+      timeout: 60
+    when: solr_dir.stat.exists == False
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: untar solr
+    unarchive:
+      src: "{{ svc_home }}/solr-6.4.0.tgz"
+      dest: "{{ svc_home }}"
+      remote_src: yes
+    args:
+      creates: "{{ svc_home }}/solr-6.4.0"
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: Remove Solr tar file
+    file:
+      path: "{{ svc_user }}/solr-6.4.0.tgz"
+      state: absent
+
+  - name: Clone Solr config repos
+    git:
+      repo: "{{ item.url }}"
+      dest: "{{ svc_home}}/solr-6.4.0/server/solr/configsets/{{ item.name }}"
+      update: yes
+      accept_hostkey: yes
+    with_items:
+      - "{{ solr_conf_repos }}"
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: make chroot folder in Zookeeper to store Solr stuff
+    shell: bin/solr zk mkroot /solr -z {{ zookeeper_host }}:2181
+    args:
+      chdir: "{{ svc_home }}/solr-6.4.0"
+    become: yes
+    become_user: "{{ svc_user }}"
+    ignore_errors: yes
+
+  - name: Copy solr.in.sh config file. Contains Zookeeper node IP.
+    template:
+      src: templates/solr.in.sh
+      dest: "{{ svc_home}}/solr-6.4.0/bin/solr.in.sh"
+      owner: "{{ svc_user }}"
+      group: "{{ svc_user }}"
+
+  - name: stop solr if its running
+    shell: bin/solr stop -all
+    args:
+      chdir: "{{ svc_home }}/solr-6.4.0"
+    become: yes
+    become_user: "{{ svc_user }}"
+    ignore_errors: yes
+
+  - name: start solr
+    shell: bin/solr start
+    args:
+      chdir: "{{ svc_home }}/solr-6.4.0"
+    become: yes
+    become_user: "{{ svc_user }}"

@@ -1,0 +1,8 @@
+---
+  env: dev
+  rails_env: development
+  apache_port: 8080
+  hostname: localhost
+  zookeeper_host: "{{ hostvars['zoo1-dev']['ansible_host'] }}"
+  solr_url: "{{ hostvars['solr1-dev']['ansible_host'] }}"
+  blacklight_git_branch: develop

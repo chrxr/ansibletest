@@ -1,0 +1,71 @@
+---
+
+  - name: Create Downloads directory
+    file:
+      path: "{{ svc_home }}/Downloads"
+      state: directory
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: make bin and src directories
+    file:
+      path: "{{ svc_home }}/sites/{{ svc_user }}/{{ item }}"
+      state: directory
+    with_items:
+      - bin
+      - src
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: untar Apache
+    unarchive:
+      src: http://archive.apache.org/dist/httpd/httpd-2.2.26.tar.gz
+      dest: "{{ svc_home }}/Downloads"
+      remote_src: yes
+      creates: "{{ svc_home }}/Downloads/httpd-2.2.26"
+    register: result
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: configure Apache
+    command: './configure --prefix={{ svc_home }}/sites/{{ svc_user }}/parts/apache --enable-mods-shared="all" --enable-so --enable-cgi --enable-info --enable-rewrite --enable-speling --enable-usertrack --enable-deflate --enable-ssl --enable-session --enable-mime-magic --enable-proxy --enable-proxy-httpd'
+    args:
+      chdir: "{{ svc_home }}/Downloads/httpd-2.2.26"
+    when: result|succeeded
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: make apache
+    command: make
+    args:
+      chdir: "{{ svc_home }}/Downloads/httpd-2.2.26"
+      creates: "{{ svc_home }}/sites/{{ svc_user }}/parts/apache"
+    when: result|succeeded
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: make install apache
+    command: make install
+    args:
+      chdir: "{{ svc_home }}/Downloads/httpd-2.2.26"
+      creates: "{{ svc_home }}/sites/{{ svc_user }}/parts/apache"
+    when: result|succeeded
+    become: yes
+    become_user: "{{ svc_user }}"
+
+  - name: Template httpd.conf file
+    template:
+      src: templates/httpd.conf
+      dest: "{{ svc_home}}/sites/{{ svc_user }}/parts/apache/conf/httpd.conf"
+      owner: "{{ svc_user }}"
+      group: "{{ svc_user }}"
+
+  - name: Template apache_passenger.conf file
+    template:
+      src: templates/apache_passenger.conf
+      dest: "{{ svc_home}}/sites/{{ svc_user }}/parts/apache/conf/apache_passenger.conf"
+      owner: "{{ svc_user }}"
+      group: "{{ svc_user }}"
+    notify:
+      - stop apache
+      - start apache

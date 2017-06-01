@@ -1,0 +1,8 @@
+---
+  - name: stop apache
+    command: "{{ svc_home }}/sites/{{ svc_user }}/parts/apache/bin/apachectl stop"
+    ignore_errors: yes
+
+  - name: start apache
+    command: "{{ svc_home }}/sites/{{ svc_user }}/parts/apache/bin/apachectl start"
+    ignore_errors: yes

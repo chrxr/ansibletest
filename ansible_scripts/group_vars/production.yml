@@ -1,0 +1,8 @@
+---
+  env: prd
+  rails_env: production
+  apache_port: 80
+  hostname: black01-prd.bodleian.ox.ac.uk
+  zookeeper_host: "{{ hostvars['zoo1-prd']['ansible_host'] }}"
+  solr_url: "{{ hostvars['solr1-prd']['ansible_host'] }}"
+  blacklight_git_branch: master
