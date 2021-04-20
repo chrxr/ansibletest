@@ -1,0 +1,50 @@
+#### Local development machines
+[zookeeper-dev]
+zoo1-dev ansible_host=172.28.128.9
+
+[solrcloud-dev]
+solr1-dev ansible_host=172.28.128.10
+solr2-dev ansible_host=172.28.128.11
+
+[blacklight-dev]
+bl1-dev ansible_host=172.28.128.12
+
+#### QA machines
+[zookeeper-qa]
+zoo1-qa ansible_host=129.67.246.168
+
+[solrcloud-qa]
+solr1-qa ansible_host=129.67.246.169
+solr2-qa ansible_host=129.67.246.172
+
+[blacklight-qa]
+bl1-qa ansible_host=129.67.246.170
+
+#### Production machines
+
+[zookeeper-prd]
+zoo1-prd ansible_host=129.67.246.184
+
+[solrcloud-prd]
+solr1-prd ansible_host=129.67.246.182
+solr2-prd ansible_host=129.67.246.183
+
+[blacklight-prd]
+bl1-prd ansible_host=129.67.246.181
+
+#### Machine groups
+
+[development:children]
+blacklight-dev
+solrcloud-dev
+zookeeper-dev
+
+[qa:children]
+blacklight-qa
+solrcloud-qa
+zookeeper-qa
+
+[production:children]
+blacklight-prd
+solrcloud-prd
+zookeeper-prd
